@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:regra_de_tres/widgets/custom_drawer.dart';
+import 'package:regra_de_tres/widgets/custom_raised_button.dart';
+import 'package:regra_de_tres/widgets/custom_text_form_field.dart';
 
 class HomePage extends StatefulWidget {
   final String tittle;
@@ -58,35 +61,9 @@ class _HomePageState extends State<HomePage> {
           )
         ],
       ),
-      drawer: Drawer(
-        child: Column(
-          children: <Widget>[
-            Container(
-              height: MediaQuery.of(context).padding.top + 10,
-            ),
-            Text(
-              "Histórico",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Divider(),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10.0),
-                child: ListView.builder(
-                  itemCount: resultados.length,
-                  itemBuilder: (context, index) {
-                    return resultados.length > 0
-                        ? Text(resultados[index])
-                        : Text("");
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
+      drawer: CustomDrawer(
+        titulo: "Histórico",
+        resultados: resultados,
       ),
       body: SingleChildScrollView(
         child: Stack(
@@ -117,20 +94,29 @@ class _HomePageState extends State<HomePage> {
                             Row(
                               children: <Widget>[
                                 Expanded(
-                                  child: customTextField("A", _aController),
+                                  child: CustomTextFormField(
+                                    controller: _aController,
+                                    hint: "A",
+                                  ),
                                 ),
                                 SizedBox(
                                   width: 8,
                                 ),
                                 Expanded(
-                                  child: customTextField("B", _bController),
+                                  child: CustomTextFormField(
+                                    controller: _bController,
+                                    hint: "B",
+                                  ),
                                 ),
                               ],
                             ),
                             Row(
                               children: <Widget>[
                                 Expanded(
-                                  child: customTextField("C", _cController),
+                                  child: CustomTextFormField(
+                                    controller: _cController,
+                                    hint: "C",
+                                  ),
                                 ),
                                 SizedBox(
                                   width: 8,
@@ -158,33 +144,21 @@ class _HomePageState extends State<HomePage> {
                             Row(
                               children: <Widget>[
                                 Expanded(
-                                    child: Material(
-                                  color: Theme.of(context).primaryColor,
-                                  child: InkWell(
-                                    child: Container(
-                                      height: 50,
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        "Calcular X",
-                                        style: TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    onTap: () {
+                                  child: CustomRaisedButton(
+                                    function: () {
                                       if (_formKey.currentState.validate()) {
                                         calculaX();
                                       }
                                     },
+                                    text: "Calcula X",
                                   ),
-                                ))
+                                ),
                               ],
                             ),
                             Expanded(
                               child: Center(
                                 child: Text(
-                                  "X = ${total.toStringAsFixed(2)}",
+                                  "X = ${total.toStringAsFixed(1)}",
                                   style: TextStyle(
                                     color: Theme.of(context).primaryColor,
                                     fontSize: 35,
@@ -213,29 +187,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
-
-Widget customTextField(String hint, TextEditingController controller) {
-  return TextFormField(
-    controller: controller,
-    keyboardType: TextInputType.number,
-    decoration: InputDecoration(
-      hintText: hint,
-      hintStyle: TextStyle(
-        color: Colors.grey[350],
-        fontSize: 60,
-      ),
-    ),
-    style: TextStyle(
-      fontSize: 50,
-    ),
-    validator: (value) {
-      if (value.isEmpty || value == 0.0) {
-        return "Inserir Dado";
-      }
-      return null;
-    },
-  );
 }
 
 class MyClipper extends CustomClipper<Path> {
