@@ -1,55 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:regra_de_tres/stores/lista_store.dart';
+import 'package:regra_de_tres/stores/total_store.dart';
 import 'package:regra_de_tres/widgets/custom_drawer.dart';
 import 'package:regra_de_tres/widgets/custom_raised_button.dart';
 import 'package:regra_de_tres/widgets/custom_text_form_field.dart';
 
-class HomePage extends StatefulWidget {
-  final String tittle;
+class HomePage extends StatelessWidget {
+  final listaStore = ListaStore();
+  final totalStore = TotalStore();
 
-  const HomePage({Key key, this.tittle}) : super(key: key);
-
-  @override
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
   final _aController = TextEditingController();
   final _bController = TextEditingController();
   final _cController = TextEditingController();
-  double total = 0.0;
-  List resultados = [];
 
   final _formKey = GlobalKey<FormState>();
 
-  void calculaX() {
-    var a = double.parse(_aController.text);
-    var b = double.parse(_bController.text);
-    var c = double.parse(_cController.text);
-
-    setState(() {
-      total = ((c * b) / a).roundToDouble();
-      resultados.insert(0, "${total.toStringAsFixed(1)}");
-    });
-
-    FocusScope.of(context).unfocus();
-  }
-
-  void resetCampos() {
-    _aController.clear();
-    _bController.clear();
-    _cController.clear();
-
-    setState(() {
-      total = 0;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    void calculaX() {
+      var a = double.parse(_aController.text);
+      var b = double.parse(_bController.text);
+      var c = double.parse(_cController.text);
+
+      totalStore.add(a, b, c);
+      listaStore.insert(totalStore.total.toStringAsFixed(1));
+    }
+
+    void resetCampos() {
+      _aController.clear();
+      _bController.clear();
+      _cController.clear();
+
+      totalStore.reset();
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.tittle,
+          "Regra de Três",
           style: TextStyle(fontSize: 25),
         ),
         centerTitle: true,
@@ -62,8 +51,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       drawer: CustomDrawer(
-        titulo: "Histórico",
-        resultados: resultados,
+        listaStore: listaStore,
       ),
       body: SingleChildScrollView(
         child: Stack(
@@ -146,6 +134,7 @@ class _HomePageState extends State<HomePage> {
                                 Expanded(
                                   child: CustomRaisedButton(
                                     function: () {
+                                      FocusScope.of(context).unfocus();
                                       if (_formKey.currentState.validate()) {
                                         calculaX();
                                       }
@@ -157,11 +146,13 @@ class _HomePageState extends State<HomePage> {
                             ),
                             Expanded(
                               child: Center(
-                                child: Text(
-                                  "X = ${total.toStringAsFixed(1)}",
-                                  style: TextStyle(
-                                    color: Theme.of(context).primaryColor,
-                                    fontSize: 35,
+                                child: Observer(
+                                  builder: (_) => Text(
+                                    "X = ${totalStore.total.toStringAsFixed(1)}",
+                                    style: TextStyle(
+                                      color: Theme.of(context).primaryColor,
+                                      fontSize: 35,
+                                    ),
                                   ),
                                 ),
                               ),

@@ -14,9 +14,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.amber,
       ),
       debugShowCheckedModeBanner: false,
-      home: HomePage(
-        tittle: titulo,
-      ),
+      home: HomePage(),
     );
   }
 }
